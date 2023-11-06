@@ -121,11 +121,11 @@ jobs:
           set -euo pipefail
 
           mkdir dist
-          mv vegeta*/* dist/
+          mv mockit*/* dist/
           cd dist
 
           VERSION=${GITHUB_REF#refs/tags/v}
-          CHECKSUMS=vegeta_${VERSION}_checksums.txt
+          CHECKSUMS=mockit_${VERSION}_checksums.txt
           sha256sum * > $CHECKSUMS
 
           echo "name=${VERSION}" >> $GITHUB_OUTPUT
