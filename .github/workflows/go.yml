@@ -11,7 +11,8 @@ on:
 
 jobs:
 
-  build:
+  qa:
+    name: Quality Assurance
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -20,9 +21,70 @@ jobs:
       uses: actions/setup-go@v4
       with:
         go-version: '1.21'
+    
+    - name: Vet
+      run: go vet ./...
 
-    - name: Build
-      run: go build -v -o mockit ./cmd/main.go
+    - name: Staticcheck
+      run: go run honnef.co/go/tools/cmd/staticcheck@latest -checks=all,-ST1000,-U1000 ./...
+    
+    - name: Vulncheck
+      run: go run golang.org/x/vuln/cmd/govulncheck@latest ./...
 
     - name: Test
-      run: make audit
+      run: go test -race ./...
+
+  build:
+    name: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target:
+          - 'windows/amd64'
+          - 'windows/arm64'
+          - 'linux/amd64'
+          - 'linux/386'
+          - 'linux/arm64'
+          - 'linux/arm'
+          - 'darwin/amd64'
+          - 'darwin/arm64'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.20'
+
+      - name: Set up GOOS and GOARCH
+        id: setup_env
+        run: |
+          echo "goos=$(echo ${{ matrix.target }} | cut -d'/' -f1)" >> $GITHUB_OUTPUT
+          echo "goarch=$(echo ${{ matrix.target }} | cut -d'/' -f2)" >> $GITHUB_OUTPUT
+
+      - name: Build
+        env:
+          GOOS: ${{ steps.setup_env.outputs.goos }}
+          GOARCH: ${{ steps.setup_env.outputs.goarch }}
+        run: |
+          set -euo pipefail
+
+          make mockit
+
+          VERSION=${GITHUB_REF#refs/tags/v}
+          NAME="mocit_${VERSION}_${GOOS}_${GOARCH}"
+          if [[ "$GOOS" != "windows" ]]; then
+            tar -czf "$NAME.tar.gz" mockit
+          else
+            zip "$NAME.zip" mockit.exe
+          fi
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: vegeta_${{ steps.setup_env.outputs.goos }}_${{ steps.setup_env.outputs.goarch }}
+          path: |
+            *.zip
+            *.tar.gz
