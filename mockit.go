@@ -26,23 +26,20 @@ type Config struct {
 }
 
 // NewRouter returns a new router based on the given configuration.
-func NewRouter(config Config) *httptreemux.TreeMux {
+func NewRouter(config Config) (http.Handler, error) {
 	router := httptreemux.New()
 
 	for _, endpoint := range config.Endpoints {
-		setupMock(router, endpoint)
+		// register endpoint
+		router.Handle(endpoint.Method, endpoint.URL, func(w http.ResponseWriter, r *http.Request, m map[string]string) {
+			w.WriteHeader(endpoint.Response.Code)
+			for k, v := range endpoint.Response.Headers {
+				w.Header().Set(k, v)
+			}
+
+			w.Write([]byte(endpoint.Response.Body))
+		})
 	}
 
-	return router
-}
-
-func setupMock(router *httptreemux.TreeMux, endpoint Endpoint) {
-	router.Handle(endpoint.Method, endpoint.URL, func(w http.ResponseWriter, r *http.Request, m map[string]string) {
-		w.WriteHeader(endpoint.Response.Code)
-		for k, v := range endpoint.Response.Headers {
-			w.Header().Set(k, v)
-		}
-
-		w.Write([]byte(endpoint.Response.Body))
-	})
+	return router, nil
 }
