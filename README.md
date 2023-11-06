@@ -20,7 +20,7 @@ endpoints:
         Content-Type: "application/json"
       body: |
         {
-          "id": "{{ params "id" }}",
+          "id": "{{ urlParam "id" }}",
           "name": "{{ name }}",
           "email": "{{ email }}",
           "username": "{{ username }}",
@@ -48,3 +48,22 @@ endpoints:
 ```bash
 mockit --config config.yml --addr :8080
 ```
+
+## Template parameters
+
+- urlParam(paramName string): 
+  - Ex.: For URL `/accounts/:id` use `{{ urlParam "id" }}` to print the `:id` parameter. 
+- uuid: `{{ uuid }}`
+- now: `{{ now }}`
+- username: `{{ username }}`
+- name: `{{ name }}`
+- email: `{{ email }}`
+- phone: `{{ phone }}`
+- int: `{{ int }}`
+- digit: `{{ digit }}`
+- digitN(n int): `{{ digitN 4 }}`
+- letter: `{{ letter }}`
+- letterN(n int): `{{ letterN 10 }}`
+- word: `{{ word }}`
+- phrase: `{{ phrase }}`
+- loremIpsum(n int): `{{ loremIpsum 10 }}`

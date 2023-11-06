@@ -69,22 +69,21 @@ func compile(text string, params map[string]string) ([]byte, error) {
 	}
 
 	funcMap := template.FuncMap{
-		"params":    paramsValue(params),
-		"uuid":      gofakeit.UUID,
-		"now":       time.Now,
-		"username":  gofakeit.Username,
-		"name":      gofakeit.Name,
-		"email":     gofakeit.Email,
-		"phone":     gofakeit.Phone,
-		"url":       gofakeit.URL,
-		"userAgent": gofakeit.UserAgent,
-		"ipv4":      gofakeit.IPv4Address,
-		"ipv6":      gofakeit.IPv6Address,
-		"int":       gofakeit.Int64,
-		"digit":     gofakeit.Digit,
-		"digitN":    gofakeit.DigitN,
-		"letter":    gofakeit.Letter,
-		"letterN":   gofakeit.LetterN,
+		"urlParam":   paramsValue(params),
+		"uuid":       gofakeit.UUID,
+		"now":        time.Now,
+		"username":   gofakeit.Username,
+		"name":       gofakeit.Name,
+		"email":      gofakeit.Email,
+		"phone":      gofakeit.Phone,
+		"int":        gofakeit.Int64,
+		"digit":      gofakeit.Digit,
+		"digitN":     gofakeit.DigitN,
+		"letter":     gofakeit.Letter,
+		"letterN":    gofakeit.LetterN,
+		"word":       gofakeit.Word,
+		"phrase":     gofakeit.Phrase,
+		"loremIpsum": gofakeit.LoremIpsumSentence,
 	}
 
 	t, err := template.New("").Funcs(funcMap).Parse(text)
