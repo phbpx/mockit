@@ -1,0 +1,12 @@
+endpoints:
+  - method: "GET"
+    url: "/accounts"
+    response:
+      code: 200
+      headers:
+        "Content-Type": "application/json"
+      body: >
+        {
+          "id":"1",
+          "name":"Gopher"
+        }
