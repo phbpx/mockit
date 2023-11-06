@@ -115,7 +115,7 @@ jobs:
       - name: Download Artifacts
         uses: actions/download-artifact@v3
 
-      - name: Create checksums and sign them
+      - name: Create checksums
         id: sign
         run: |
           set -euo pipefail
