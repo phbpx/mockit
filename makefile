@@ -45,3 +45,17 @@ test:
 test/cover:
 	go test -v -race -buildvcs -coverprofile=/tmp/coverage.out ./...
 	go tool cover -html=/tmp/coverage.out
+
+# ==================================================================================== #
+# BUILD
+# ==================================================================================== #
+
+## docker: build doker image
+.PHONY: docker
+docker:
+	docker buildx build -t quay.io/phbpx/mockit:latest .
+
+## mockit: build executable
+.PHONY: mockit
+mockit:
+	go build -v -o mockit ./cmd/main.go

@@ -17,18 +17,6 @@ type appConfig struct {
 	addr        string
 }
 
-func (c *appConfig) Validate() error {
-	if len(c.configSlice) == 0 {
-		return fmt.Errorf("no configs provided")
-	}
-
-	if c.addr == "" {
-		return fmt.Errorf("no address provided")
-	}
-
-	return nil
-}
-
 type configSlice []string
 
 func (c *configSlice) Set(value string) error {
