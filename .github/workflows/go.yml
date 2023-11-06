@@ -115,14 +115,26 @@ jobs:
       - name: Download Artifacts
         uses: actions/download-artifact@v3
 
+      - name: Create checksums and sign them
+        id: sign
+        run: |
+          set -euo pipefail
+
+          mkdir dist
+          mv vegeta*/* dist/
+          cd dist
+
+          VERSION=${GITHUB_REF#refs/tags/v}
+          CHECKSUMS=vegeta_${VERSION}_checksums.txt
+          sha256sum * > $CHECKSUMS
+
+          echo "name=${VERSION}" >> $GITHUB_OUTPUT
+
       - name: Generate release notes
         id: release_notes
         run: |
           set -x
           set -euo pipefail
-
-          mkdir dist
-          mv mockit*/* dist/
 
           CURRENT_VERSION=${GITHUB_REF#refs/tags/}
           PREV_VERSION=$(git describe --tags --abbrev=0 $CURRENT_VERSION^)
