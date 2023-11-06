@@ -12,6 +12,23 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+type appConfig struct {
+	configSlice configSlice
+	addr        string
+}
+
+func (c *appConfig) Validate() error {
+	if len(c.configSlice) == 0 {
+		return fmt.Errorf("no configs provided")
+	}
+
+	if c.addr == "" {
+		return fmt.Errorf("no address provided")
+	}
+
+	return nil
+}
+
 type configSlice []string
 
 func (c *configSlice) Set(value string) error {
@@ -23,43 +40,41 @@ func (c *configSlice) String() string {
 	return strings.Join(*c, ", ")
 }
 
+// ============================================================================
+
 func main() {
-	var configs configSlice
-	var addr string
+	cfg := newAppConfig()
 
-	flag.Var(&configs, "config", "configuration file (.yml || .yaml)")
-	flag.StringVar(&addr, "addr", ":8080", "http service address")
-	flag.Parse()
-
-	if err := run(configs, addr); err != nil {
+	if err := run(cfg); err != nil {
 		fmt.Printf("run: %v", err)
 		os.Exit(1)
 	}
 }
 
-func run(configs configSlice, addr string) error {
+func run(cfg appConfig) error {
 	var merged mockit.Config
-	for _, path := range configs {
+	for _, path := range cfg.configSlice {
 		cfg := mockit.Config{}
-		if err := loadConfig(path, &cfg); err != nil {
-			return err
+
+		content, err := os.ReadFile(path)
+		if err != nil {
+			return fmt.Errorf("read config [%s]: %v", path, err)
+		}
+
+		if err := yaml.Unmarshal(content, &cfg); err != nil {
+			return fmt.Errorf("unmarshal config [%s]: %v", path, err)
 		}
 
 		merged.Endpoints = append(merged.Endpoints, cfg.Endpoints...)
 	}
 
-	handler, err := mockit.NewRouter(merged)
-	if err != nil {
-		return err
-	}
-
 	srv := http.Server{
-		Addr:     addr,
-		Handler:  handler,
+		Addr:     cfg.addr,
+		Handler:  mockit.NewRouter(merged),
 		ErrorLog: log.New(os.Stderr, "", log.LstdFlags),
 	}
 
-	fmt.Printf("running on %s\n", addr)
+	fmt.Printf("running on %s\n", cfg.addr)
 	for _, endpoint := range merged.Endpoints {
 		fmt.Printf("(%s) %s\n", endpoint.Method, endpoint.URL)
 	}
@@ -67,15 +82,22 @@ func run(configs configSlice, addr string) error {
 	return srv.ListenAndServe()
 }
 
-func loadConfig(path string, cfg *mockit.Config) error {
-	content, err := os.ReadFile(path)
-	if err != nil {
-		return fmt.Errorf("read config [%s]: %v", path, err)
+func newAppConfig() appConfig {
+	appConfig := &appConfig{}
+
+	flag.StringVar(&appConfig.addr, "addr", ":8080", "http service address")
+	flag.Var(&appConfig.configSlice, "config", "")
+	flag.Parse()
+
+	envAddr := os.Getenv("MOCKIT_ADDR")
+	if envAddr != "" {
+		appConfig.addr = envAddr
 	}
 
-	if err := yaml.Unmarshal(content, cfg); err != nil {
-		return fmt.Errorf("unmarshal config [%s]: %v", path, err)
+	envConfigs := os.Getenv("MOCKIT_CONFIG")
+	if envConfigs != "" {
+		appConfig.configSlice = strings.Split(strings.TrimSpace(envConfigs), ",")
 	}
 
-	return nil
+	return *appConfig
 }

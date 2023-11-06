@@ -7,7 +7,7 @@ endpoints:
         Content-Type: "application/json"
       body: |
         {
-          "id": "{{ params "id" }}",
+          "id": "{{ urlParam "id" }}",
           "name": "{{ name }}",
           "email": "{{ email }}",
           "username": "{{ username }}",

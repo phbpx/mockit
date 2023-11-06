@@ -35,7 +35,7 @@ type Config struct {
 }
 
 // NewRouter returns a new router based on the given configuration.
-func NewRouter(config Config) (http.Handler, error) {
+func NewRouter(config Config) http.Handler {
 	router := httptreemux.New()
 
 	for _, e := range config.Endpoints {
@@ -60,7 +60,7 @@ func NewRouter(config Config) (http.Handler, error) {
 		})
 	}
 
-	return router, nil
+	return router
 }
 
 func compile(text string, params map[string]string) ([]byte, error) {
