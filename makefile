@@ -58,4 +58,4 @@ docker:
 ## mockit: build executable
 .PHONY: mockit
 mockit:
-	go build -v -o mockit ./cmd/main.go
+	go build -o mockit ./cmd/main.go

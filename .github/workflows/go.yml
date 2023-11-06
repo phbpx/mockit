@@ -85,10 +85,11 @@ jobs:
           make mockit
 
           VERSION=${GITHUB_REF#refs/tags/v}
-          NAME="mocit_${VERSION}_${GOOS}_${GOARCH}"
+          NAME="mockit_${VERSION}_${GOOS}_${GOARCH}"
           if [[ "$GOOS" != "windows" ]]; then
             tar -czf "$NAME.tar.gz" mockit
           else
+            mv mockit mockit.exe
             zip "$NAME.zip" mockit.exe
           fi
 
