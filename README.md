@@ -63,7 +63,7 @@ endpoints:
 
 2. Run CLI:
 ```bash
-mockit --config config.yml --addr :8080
+mockit -config conf.yml -addr :8080
 ```
 
 ## Run `mockit` using docker/postman
@@ -90,9 +90,14 @@ endpoints:
 
 2. Run docker:
 
-```sh
+```bash
+docker run \
+  -v "$(pwd):/src" \
+  -e MOCKIT_CONFIG="/src/conf.yml" \
+  -e MOCKIT_ADDR="0.0.0.0:8080" \
+  -p 8080:8080 \
+  quay.io/phbpx/mockit:latest
 ```
-
 
 ## Template functions
 
