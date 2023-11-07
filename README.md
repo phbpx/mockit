@@ -2,6 +2,13 @@
 
 `mockit` is a dead simple yet powerful HTTP API mock CLI.
 
+# Features
+
+- Simple CLI.
+- Simple configuration file (and you can split it into multiple files).
+- Support response body template values.
+- Buitin functions to generate random template values such as: `uuid`, `now`, `name` and `email`
+
 ## Install
 
 ### Pre-compiled executables
@@ -17,7 +24,7 @@ make mockit
 sudo mv mockit ~/usr/local/bin # Or elsewhere, up to you.
 ```
 
-## How to use
+## Run `mockit` using CLI
 
 1. Define your mocks in the configuration file:
 ```yml
@@ -59,7 +66,35 @@ endpoints:
 mockit --config config.yml --addr :8080
 ```
 
-## Template parameters
+## Run `mockit` using docker/postman
+
+1. Define your mocks in the configuration file:
+```yml
+endpoints:
+  - method: "GET"
+    url: "/accounts/:id"
+    response:
+      code: 200
+      headers:
+        Content-Type: "application/json"
+      body: |
+        {
+          "id": "{{ urlParam "id" }}",
+          "name": "{{ name }}",
+          "email": "{{ email }}",
+          "username": "{{ username }}",
+          "fixed": "abcd",
+          "createdAt": "{{ now.Format "2006-01-02T15:04:05Z" }}"
+        }
+```
+
+2. Run docker:
+
+```sh
+```
+
+
+## Template functions
 
 - urlParam(paramName string): 
   - Ex.: For URL `/accounts/:id` use `{{ urlParam "id" }}` to print the `:id` parameter. 
