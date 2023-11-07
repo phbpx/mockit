@@ -26,6 +26,16 @@ sudo mv mockit ~/usr/local/bin # Or elsewhere, up to you.
 
 ## Run `mockit` using CLI
 
+CLI usage:
+```bash 
+$ mockit -h
+Usage of mockit:
+  -config value
+        config file path
+  -port string
+        http port to listen on (default "8080")
+```
+
 1. Define your mocks in the configuration file:
 ```yml
 endpoints:
@@ -63,7 +73,7 @@ endpoints:
 
 2. Run CLI:
 ```bash
-mockit -config conf.yml -addr :8080
+mockit -config conf.yml -port 8080
 ```
 
 ## Run `mockit` using docker/postman
@@ -94,7 +104,7 @@ endpoints:
 docker run \
   -v "$(pwd):/src" \
   -e MOCKIT_CONFIG="/src/conf.yml" \
-  -e MOCKIT_ADDR="0.0.0.0:8080" \
+  -e MOCKIT_PORT="8080" \
   -p 8080:8080 \
   quay.io/phbpx/mockit:latest
 ```

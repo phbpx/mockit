@@ -53,7 +53,7 @@ test/cover:
 ## docker: build doker image
 .PHONY: docker
 docker:
-	docker buildx build -t quay.io/phbpx/mockit:latest .
+	docker buildx build --platform=linux/amd64,linux/arm64 -t quay.io/phbpx/mockit:latest . --push
 
 ## mockit: build executable
 .PHONY: mockit

@@ -14,7 +14,7 @@ import (
 
 type appConfig struct {
 	configSlice configSlice
-	addr        string
+	port        string
 }
 
 type configSlice []string
@@ -57,12 +57,12 @@ func run(cfg appConfig) error {
 	}
 
 	srv := http.Server{
-		Addr:     cfg.addr,
+		Addr:     fmt.Sprintf("0.0.0.0:%s", cfg.port),
 		Handler:  mockit.NewRouter(merged),
 		ErrorLog: log.New(os.Stderr, "", log.LstdFlags),
 	}
 
-	fmt.Printf("running on %s\n", cfg.addr)
+	fmt.Printf("running on %s\n", cfg.port)
 	for _, endpoint := range merged.Endpoints {
 		fmt.Printf("(%s) %s\n", endpoint.Method, endpoint.URL)
 	}
@@ -73,13 +73,13 @@ func run(cfg appConfig) error {
 func newAppConfig() appConfig {
 	appConfig := &appConfig{}
 
-	flag.StringVar(&appConfig.addr, "addr", ":8080", "http service address")
-	flag.Var(&appConfig.configSlice, "config", "")
+	flag.StringVar(&appConfig.port, "port", "8080", "http port to listen on")
+	flag.Var(&appConfig.configSlice, "config", "config file path")
 	flag.Parse()
 
-	envAddr := os.Getenv("MOCKIT_ADDR")
-	if envAddr != "" {
-		appConfig.addr = envAddr
+	envPort := os.Getenv("MOCKIT_PORT")
+	if envPort != "" {
+		appConfig.port = envPort
 	}
 
 	envConfigs := os.Getenv("MOCKIT_CONFIG")
