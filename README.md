@@ -2,10 +2,20 @@
 
 `mockit` is a dead simple yet powerful HTTP API mock CLI.
 
-## Features
+## Install
 
-- Multiple configuration files.
-- Template values for response body.
+### Pre-compiled executables
+
+Get them [here](https://github.com/phbpx/mockit/releases)
+
+### Source
+
+```sh
+git@github.com:phbpx/mockit.git
+cd mockit
+make mockit
+sudo mv mockit ~/usr/local/bin # Or elsewhere, up to you.
+```
 
 ## How to use
 
